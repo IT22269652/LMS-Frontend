@@ -1,13 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mail, Lock, AlertCircle, CheckCircle, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Mail, Lock, AlertCircle, CheckCircle, Eye, EyeOff, Sparkles, User } from 'lucide-react';
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { signup } = useAuth();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -34,12 +38,19 @@ export default function SignupPage() {
     }
 
     setLoading(true);
+
+    const result = await signup(name, email, password);
     
-    // Backend integration needed
-    setTimeout(() => {
-      setSuccess('Account created successfully! Redirecting to login...');
-      setLoading(false);
-    }, 1000);
+    if (result.success) {
+      setSuccess(result.message);
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+    } else {
+      setError(result.message);
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -78,12 +89,12 @@ export default function SignupPage() {
                 </div>
               )}
 
-               <div className="space-y-2">
+              <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-700">Full Name</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-500" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-500" />
                   <Input
-                    type="name"
+                    type="text"
                     placeholder="Enter your name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -152,7 +163,7 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full h-12 text-lg font-semibold" variant="primary" disabled={loading}>
+              <Button type="submit" className="w-full h-12 text-lg font-semibold" disabled={loading}>
                 {loading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
