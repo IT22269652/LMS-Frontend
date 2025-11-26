@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Library, Search, Menu, X, Home, Info, Shield, Mail, BookOpen, LayoutDashboard } from 'lucide-react';
+import { Library, Search, Menu, X, Home, Info, Shield, Mail, BookOpen, LayoutDashboard, LogOut, User } from 'lucide-react';
 
 export default function Navbar() {
-  const { user, isLibrarian } = useAuth();
+  const { user, isLibrarian, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,7 +66,16 @@ export default function Navbar() {
             {/* User Actions */}
             {user ? (
               <>
-                <Link href={isLibrarian ? '/dashboard' : '/books'} className="hidden sm:block">
+                {/* User Info */}
+                <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg">
+                  <User className="h-4 w-4 text-slate-600" />
+                  <span className="text-sm font-medium text-slate-700">
+                    {user.email?.split('@')[0]}
+                  </span>
+                </div>
+
+                {/* Dashboard/Books Link */}
+                <Link href={isLibrarian ? '/admin/dashboard' : '/user/books'} className="hidden sm:block">
                   <Button variant="ghost" size="sm" className="gap-2">
                     {isLibrarian ? (
                       <>
@@ -81,6 +90,12 @@ export default function Navbar() {
                     )}
                   </Button>
                 </Link>
+
+                {/* Logout Button */}
+                <Button variant="ghost" size="sm" onClick={logout} className="hidden sm:flex gap-2 text-red-600 hover:text-red-700 hover:bg-red-50">
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
               </>
             ) : (
               <>
@@ -142,6 +157,16 @@ export default function Navbar() {
               </Button>
             </form>
 
+            {/* User Info (Mobile) */}
+            {user && (
+              <div className="flex items-center gap-2 px-4 py-3 bg-slate-100 rounded-lg mb-2">
+                <User className="h-4 w-4 text-slate-600" />
+                <span className="text-sm font-medium text-slate-700">
+                  {user.email}
+                </span>
+              </div>
+            )}
+
             {/* Navigation Links */}
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} onClick={() => setIsMenuOpen(false)}>
@@ -155,21 +180,34 @@ export default function Navbar() {
             {/* User Actions */}
             <div className="pt-2 border-t space-y-2">
               {user ? (
-                <Link href={isLibrarian ? '/dashboard' : '/books'} onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-start gap-2">
-                    {isLibrarian ? (
-                      <>
-                        <LayoutDashboard className="h-4 w-4" />
-                        Dashboard
-                      </>
-                    ) : (
-                      <>
-                        <BookOpen className="h-4 w-4" />
-                        Browse Books
-                      </>
-                    )}
+                <>
+                  <Link href={isLibrarian ? '/admin/dashboard' : '/user/books'} onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start gap-2">
+                      {isLibrarian ? (
+                        <>
+                          <LayoutDashboard className="h-4 w-4" />
+                          Dashboard
+                        </>
+                      ) : (
+                        <>
+                          <BookOpen className="h-4 w-4" />
+                          Browse Books
+                        </>
+                      )}
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
                   </Button>
-                </Link>
+                </>
               ) : (
                 <>
                   <Link href="/login" onClick={() => setIsMenuOpen(false)}>
