@@ -1,28 +1,77 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import AdminNavbar from '@/components/AdminNavbar';
 import AdminSidebar from '@/components/AdminSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Users, FolderOpen, TrendingUp, Calendar, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import { booksAPI, categoriesAPI, usersAPI } from '@/lib/api';
 
 export default function AdminDashboardPage() {
-  const stats = {
+  const router = useRouter();
+  const { user, isLibrarian, loading } = useAuth();
+  const [stats, setStats] = useState({
     totalBooks: 0,
     totalUsers: 0,
     totalCategories: 0,
     activeReservations: 0
-  };
+  });
+  const [dataLoading, setDataLoading] = useState(true);
 
-  const recentActivities = [];
+  useEffect(() => {
+    if (!loading && !isLibrarian) {
+      router.push('/');
+    }
+  }, [loading, isLibrarian, router]);
+
+  useEffect(() => {
+    if (isLibrarian) {
+      fetchDashboardData();
+    }
+  }, [isLibrarian]);
+
+  const fetchDashboardData = async () => {
+    try {
+      setDataLoading(true);
+      const [booksRes, categoriesRes] = await Promise.all([
+        booksAPI.getAll(),
+        categoriesAPI.getAll()
+      ]);
+
+      setStats({
+        totalBooks: booksRes.data.length,
+        totalUsers: 0, // Will be implemented when users endpoint is ready
+        totalCategories: categoriesRes.data.length,
+        activeReservations: booksRes.data.filter(b => b.status === 'RESERVED').length
+      });
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    } finally {
+      setDataLoading(false);
+    }
+  };
 
   const quickStats = [
     { label: 'Books Added This Month', value: 0, icon: BookOpen, color: 'from-blue-500 to-blue-600' },
     { label: 'New Users This Month', value: 0, icon: Users, color: 'from-green-500 to-green-600' },
-    { label: 'Active Reservations', value: 0, icon: Calendar, color: 'from-purple-500 to-purple-600' },
+    { label: 'Active Reservations', value: stats.activeReservations, icon: Calendar, color: 'from-purple-500 to-purple-600' },
     { label: 'Returned This Week', value: 0, icon: CheckCircle, color: 'from-orange-500 to-orange-600' }
   ];
+
+  if (loading || !isLibrarian) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -45,7 +94,9 @@ export default function AdminDashboardPage() {
                   <BookOpen className="h-5 w-5 text-blue-600" />
                 </CardHeader>
                 <CardContent className="bg-transparent">
-                  <div className="text-3xl font-bold text-slate-800">{stats.totalBooks}</div>
+                  <div className="text-3xl font-bold text-slate-800">
+                    {dataLoading ? '...' : stats.totalBooks}
+                  </div>
                   <Link href="/admin/books" className="text-xs text-blue-600 hover:underline">
                     Manage books →
                   </Link>
@@ -58,7 +109,9 @@ export default function AdminDashboardPage() {
                   <Users className="h-5 w-5 text-green-600" />
                 </CardHeader>
                 <CardContent className="bg-transparent">
-                  <div className="text-3xl font-bold text-slate-800">{stats.totalUsers}</div>
+                  <div className="text-3xl font-bold text-slate-800">
+                    {dataLoading ? '...' : stats.totalUsers}
+                  </div>
                   <Link href="/admin/users" className="text-xs text-green-600 hover:underline">
                     Manage users →
                   </Link>
@@ -71,7 +124,9 @@ export default function AdminDashboardPage() {
                   <FolderOpen className="h-5 w-5 text-purple-600" />
                 </CardHeader>
                 <CardContent className="bg-transparent">
-                  <div className="text-3xl font-bold text-slate-800">{stats.totalCategories}</div>
+                  <div className="text-3xl font-bold text-slate-800">
+                    {dataLoading ? '...' : stats.totalCategories}
+                  </div>
                   <Link href="/admin/categories" className="text-xs text-purple-600 hover:underline">
                     Manage categories →
                   </Link>
@@ -84,7 +139,9 @@ export default function AdminDashboardPage() {
                   <TrendingUp className="h-5 w-5 text-orange-600" />
                 </CardHeader>
                 <CardContent className="bg-transparent">
-                  <div className="text-3xl font-bold text-slate-800">{stats.activeReservations}</div>
+                  <div className="text-3xl font-bold text-slate-800">
+                    {dataLoading ? '...' : stats.activeReservations}
+                  </div>
                   <p className="text-xs text-slate-600">Currently borrowed</p>
                 </CardContent>
               </Card>
@@ -107,7 +164,7 @@ export default function AdminDashboardPage() {
                           </div>
                           <div>
                             <p className="text-sm font-medium opacity-90">{stat.label}</p>
-                            <p className="text-3xl font-bold">{stat.value}</p>
+                            <p className="text-3xl font-bold">{dataLoading ? '...' : stat.value}</p>
                           </div>
                         </div>
                       ))}
@@ -124,21 +181,9 @@ export default function AdminDashboardPage() {
                     <CardDescription>Latest system updates</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-6">
-                    {recentActivities.length === 0 ? (
-                      <p className="text-center text-slate-500 py-8">No recent activities</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {recentActivities.map((activity) => (
-                          <div key={activity.id} className="flex gap-3">
-                            <div className="w-3 h-3 mt-2 rounded-full bg-blue-500 flex-shrink-0" />
-                            <div>
-                              <p className="text-sm font-medium text-slate-800">{activity.message}</p>
-                              <p className="text-xs text-slate-500">{activity.time}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div className="text-center py-8">
+                      <p className="text-slate-500">No recent activities</p>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
