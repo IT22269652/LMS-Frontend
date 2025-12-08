@@ -109,13 +109,6 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </div>
-
-            {/* Admin Login Info */}
-            <div className="mt-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
-              <p className="text-sm font-semibold text-blue-800 mb-2">Admin Access:</p>
-              <p className="text-xs text-blue-700">Email: admin@gmail.com</p>
-              <p className="text-xs text-blue-700">Password: admin123</p>
-            </div>
           </CardContent>
         </Card>
 
