@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mail, Lock, AlertCircle, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Eye, EyeOff, BookOpen, Library, Sparkles } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,89 +32,134 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="inline-block p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mb-4">
-            <Sparkles className="h-10 w-10 text-white" />
+    <div className="min-h-screen flex">
+      {/* Left Side - Image Section */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 relative overflow-hidden">
+        {/* Decorative circles */}
+        <div className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+        
+        <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-white">
+          <div className="mb-8">
+            <Library className="h-24 w-24 text-white drop-shadow-lg" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Welcome Back!
-          </h1>
-          <p className="text-gray-600">Login to continue your reading journey</p>
+          
+          <h1 className="text-5xl font-bold mb-4 text-center">LibraryMS</h1>
+          <p className="text-xl text-center mb-8 text-emerald-100">Your Digital Library Management Solution</p>
+          
+          {/* Library illustration */}
+          <div className="relative w-full max-w-md mt-8">
+            <img 
+              src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&q=80" 
+              alt="Library" 
+              className="rounded-2xl shadow-2xl object-cover w-full h-80"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-teal-900/50 to-transparent rounded-2xl"></div>
+          </div>
+          
+          <div className="mt-12 flex items-center gap-8 text-emerald-100">
+            <div className="text-center">
+              <BookOpen className="h-8 w-8 mx-auto mb-2" />
+              <p className="text-sm">Manage Books</p>
+            </div>
+            <div className="text-center">
+              <Sparkles className="h-8 w-8 mx-auto mb-2" />
+              <p className="text-sm">Track Members</p>
+            </div>
+            <div className="text-center">
+              <Library className="h-8 w-8 mx-auto mb-2" />
+              <p className="text-sm">Easy Access</p>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <Card className="border-2 border-purple-200 shadow-2xl">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-            <CardTitle className="text-3xl font-bold text-center">Login</CardTitle>
-            <CardDescription className="text-center text-blue-100">
-              Enter your credentials to access your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-8">
+            <div className="inline-block p-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mb-4">
+              <Library className="h-10 w-10 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              LibraryMS
+            </h1>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-4xl font-bold text-gray-900 mb-2">Welcome Back!</h2>
+            <p className="text-gray-600">Login to continue your reading journey</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
+                <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded flex items-start gap-2">
                   <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                   <p className="text-sm font-medium">{error}</p>
                 </div>
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-700">Email</label>
+                <label className="text-sm font-semibold text-gray-700">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-500" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-teal-500" />
                   <Input
                     type="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-12 border-2 border-purple-200 focus:border-purple-500 h-12"
+                    className="pl-11 border-2 border-gray-200 rounded-lg focus:border-teal-500 h-12"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-700">Password</label>
+                <label className="text-sm font-semibold text-gray-700">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-500" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-teal-500" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-12 pr-12 border-2 border-purple-200 focus:border-purple-500 h-12"
+                    className="pl-11 pr-12 border-2 border-gray-200 rounded-lg focus:border-teal-500 h-12"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-purple-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-teal-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
               </div>
 
-              <Button type="submit" className="w-full h-12 text-lg font-semibold" disabled={loading}>
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3 h-12 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl" 
+                disabled={loading}
+              >
                 {loading ? 'Logging in...' : 'Login'}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <span className="text-gray-600">Don't have an account? </span>
-              <Link href="/signup" className="text-purple-600 hover:text-purple-700 font-bold hover:underline">
+              <Link href="/signup" className="text-teal-600 hover:text-teal-700 font-semibold hover:underline">
                 Sign up
               </Link>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        <div className="mt-6 text-center">
-          <Link href="/" className="text-purple-600 hover:text-purple-700 font-medium hover:underline">
-            ← Back to Home
-          </Link>
+          <div className="mt-6 text-center">
+            <Link href="/" className="text-teal-600 hover:text-teal-700 font-medium hover:underline inline-flex items-center gap-1">
+              ← Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     </div>

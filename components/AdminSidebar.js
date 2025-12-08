@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, BookOpen, FolderOpen, Users, Menu, X } from 'lucide-react';
+import { LayoutDashboard, BookOpen, FolderOpen, Users, Menu, X, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AdminSidebar() {
@@ -13,6 +13,7 @@ export default function AdminSidebar() {
     { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/books', label: 'Manage Books', icon: BookOpen },
     { href: '/admin/categories', label: 'Categories', icon: FolderOpen },
+    { href: '/admin/reservations', label: 'Reservations', icon: Calendar },
     { href: '/admin/users', label: 'Manage Users', icon: Users },
   ];
 
